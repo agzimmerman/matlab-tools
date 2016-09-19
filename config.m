@@ -11,13 +11,20 @@ function Config = config(SpecifiedPairs, DefaultPairs)
 %       found in SpecifiedPairs will take priority over names found in
 %       DefaultPairs. These are typically a constant in the parent program.
 %
+%       Each specified name must match a default name.
+%
 %       Config is a struct where Config.Name = Value
 %
 %   TODO: Type checking, other validation
 for i = 1:2:(length(SpecifiedPairs) - 1)
     Config.(SpecifiedPairs{i}) = SpecifiedPairs{i+1};
 end
+
 SpecifiedNames = SpecifiedPairs(1:2:(end-1));
+DefaultNames = DefaultPairs(1:2:(end-1));
+
+assert(all(ismember(SpecifiedNames, DefaultNames)));
+
 for i = 1:2:(length(DefaultPairs) - 1)
     DefaultName = DefaultPairs{i};
     if ismember(DefaultName, SpecifiedNames)
@@ -25,4 +32,5 @@ for i = 1:2:(length(DefaultPairs) - 1)
     end
     Config.(DefaultName) = DefaultPairs{i+1};
 end
+
 end
