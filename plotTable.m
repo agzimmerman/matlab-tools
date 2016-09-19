@@ -33,6 +33,9 @@ function plotTable(Table, XName, YName, varargin)
 %   'PlotFunction'
 %       plotting function handle
 %       [function handle] Default: plot
+%   'ColorFunction'
+%       coloring function handle
+%       [function handle] Default: hsv
 %   'ManualLimits'
 %       axes limits (xmin, xmax, ymin, ymax)
 %       [1x4 double] Default: empty
@@ -109,6 +112,7 @@ DefaultPairs = {
     'FigureSliceNames', {},...
     'SaveFiguresAs', {},...
     'PlotFunction', @plot,...
+    'ColorFunction', @hsv,...
     'ManualLimits', [],...
     'SetXTicks', false,...
     'YMinMeanMax', false,...
@@ -141,7 +145,7 @@ Config.LineSliceNames = [Config.LineColorSliceNames,...
 %% Make line color and type tables.
 ColorTable = unique(Table(:,Config.LineColorSliceNames));
 ColorCount = height(ColorTable);
-Color = hsv(ColorCount);
+Color = Config.ColorFunction(ColorCount);
 Color = Color(end:-1:1,:); % Re-rder colors from cold to hot.
 ColorTable = [ColorTable, table(Color)];
 %
