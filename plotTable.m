@@ -57,6 +57,10 @@ function plotTable(Table, XName, YName, varargin)
 %       Specify a constant line type, with the same notation as PLOT
 %       [char array] Default: '-'
 %
+%   'LineMarker'
+%       Specify a constant line type, with the same notation as PLOT
+%       [char array] Default: 'o'
+%
 % The following Properties of Table may be used for annotating the figures.
 %   Table.Properties.VariableUnits
 %       Labels will include the units. If units are empty then they wil
@@ -118,7 +122,8 @@ DefaultPairs = {
     'YMinMeanMax', false,...
     'EqualAxis', false,...
     'LegendLocation', 'Best',...
-    'LineStyle', '-'};
+    'LineStyle', '-',...
+    'LineMarker' 'o'};
 Config = config(varargin, DefaultPairs);
 %% Validate some inputs. 
 % Force some inputs to be cells.
@@ -200,7 +205,8 @@ for ifig = 1:FigureCount
         if ~Config.YMinMeanMax %% Plot Y vs. X.
             LinesToLabel(iline) = Config.PlotFunction(table2array(...
                 LineSlice(:,XName)), table2array(LineSlice(:,YName)),...
-                Type, 'Color', Color, 'LineStyle', Config.LineStyle);
+                Type, 'Color', Color, 'LineStyle', Config.LineStyle,...
+                'Marker', Config.LineMarker);
         else %% Plot min(Y), mean(Y), and max(Y) each vs X.
             % Todo: Separate the statistics part of this code, perhaps by
             % making new tables with reduced statistics and recursively
