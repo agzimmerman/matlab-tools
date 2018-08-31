@@ -288,7 +288,12 @@ for ifig = 1:FigureCount
                 toString(table2array(FigureSliceValue(1,ifs)))]; %#ok<AGROW>
         end
         for isave = 1:length(Config.SaveFiguresAs)
-            saveas(Figure, FileName, Config.SaveFiguresAs{isave});
+            Extension = Config.SaveFiguresAs{isave};
+            if strcmp(Config.SaveFiguresAs{isave}, Extension)
+                saveas(Figure, [FileName, '.', Extension]);
+            else
+                saveas(Figure, [FileName, '.', Extension], Extension);
+            end
         end
     end
 end
