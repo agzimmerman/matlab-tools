@@ -52,14 +52,10 @@ function plotTable(Table, XName, YName, varargin)
 %   'LegendLocation'
 %       Legend location for legend() function's 'Location' parameter.
 %       [char array] Default: 'Best'
-%
-%   'LineStyle'
-%       Specify a constant line type, with the same notation as PLOT
-%       [char array] Default: '-'
-%
-%   'LineMarker'
-%       Specify a constant line type, with the same notation as PLOT
-%       [char array] Default: 'o'
+%   'LineTypePool'
+%       Specify a pool to pull line types from, 
+%       with the same notation as PLOT
+%       [char array] Default: {'-o', '-.x', '--s', ':d'}
 %
 % The following Properties of Table may be used for annotating the figures.
 %   Table.Properties.VariableUnits
@@ -122,8 +118,7 @@ DefaultPairs = {
     'YMinMeanMax', false,...
     'EqualAxis', false,...
     'LegendLocation', 'Best',...
-    'LineStyle', '-',...
-    'LineMarker' 'o'};
+    'LineTypePool', {'-o', '-.x', '--s', ':d'}};
 Config = config(varargin, DefaultPairs);
 %% Validate some inputs. 
 % Force some inputs to be cells.
@@ -148,21 +143,21 @@ end
 Config.LineSliceNames = [Config.LineColorSliceNames,...
     Config.LineTypeSliceNames];
 %% Make line color and type tables.
+LineTypePool = Config.LineTypePool;
 ColorTable = unique(Table(:,Config.LineColorSliceNames));
 ColorCount = height(ColorTable);
 Color = Config.ColorFunction(ColorCount);
 Color = Color(end:-1:1,:); % Re-rder colors from cold to hot.
 ColorTable = [ColorTable, table(Color)];
 %
-TypeTable = unique(Table(:,Config.LineTypeSliceNames));
-TypeCount = height(TypeTable);
-TypePool = {'-o', '--x', '-.s', '..d'};
-if TypeCount > length(TypePool)
-    error('Edit the script to extend the TypePool.')
+LineTypeTable = unique(Table(:,Config.LineTypeSliceNames));
+LineTypeCount = height(LineTypeTable);
+if LineTypeCount > length(LineTypePool)
+    error('Provide a larger LineTypePool.')
 end
-TypeTable.Type = cell(height(TypeTable), 1);
-for i = 1:height(TypeTable)
-    TypeTable.Type(i) = TypePool(i);
+LineTypeTable.Type = cell(height(LineTypeTable), 1);
+for i = 1:height(LineTypeTable)
+    LineTypeTable.Type(i) = LineTypePool(i);
 end
 %% Make a figure for each figure slice.
 FigureSliceValues = unique(Table(:,Config.FigureSliceNames));
@@ -198,15 +193,16 @@ for ifig = 1:FigureCount
         LineSliceValue = LineSliceValues(iline,:);
         LineSlice = FigureSlice(ismember(...
             FigureSlice(:,Config.LineSliceNames), LineSliceValue),:);
-        Color = ColorTable(ismember(ColorTable(:,Config.LineColorSliceNames),...
+        Color = ColorTable(ismember(...
+            ColorTable(:,Config.LineColorSliceNames),...
             LineSliceValue(:,Config.LineColorSliceNames)),:).Color;
-        Type = TypeTable(ismember(TypeTable(:,Config.LineTypeSliceNames),...
+        LineType = LineTypeTable(ismember(...
+            LineTypeTable(:,Config.LineTypeSliceNames),...
             LineSliceValue(:,Config.LineTypeSliceNames)),:).Type{1};
         if ~Config.YMinMeanMax %% Plot Y vs. X.
             LinesToLabel(iline) = Config.PlotFunction(table2array(...
                 LineSlice(:,XName)), table2array(LineSlice(:,YName)),...
-                Type, 'Color', Color, 'LineStyle', Config.LineStyle,...
-                'Marker', Config.LineMarker);
+                LineType, 'Color', Color);
         else %% Plot min(Y), mean(Y), and max(Y) each vs X.
             % Todo: Separate the statistics part of this code, perhaps by
             % making new tables with reduced statistics and recursively
