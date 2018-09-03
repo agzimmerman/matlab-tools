@@ -433,11 +433,11 @@ for ifig = 1:FigureCount
     
     
     %% Save the figure.
-    TableName = inputname(1);
-    
     if ~isempty(Config.SaveFiguresAs)
+    
+        TableName = inputname(1);
         
-        FileName = [YName, 'vs', XName];
+        FileName = TableName;
         
         for ifs = 1:length(Config.FigureSliceNames)
             
@@ -446,18 +446,20 @@ for ifig = 1:FigureCount
             
         end
         
+        FileName = [FileName, '_', YName, '_vs_', XName];
+        
         for isave = 1:length(Config.SaveFiguresAs)
             
             Extension = Config.SaveFiguresAs{isave};
             
             if strcmp(Config.SaveFiguresAs{isave}, Extension)
                 
-                saveas(Figure, [TableName, '_', FileName, '.', Extension]);
+                saveas(Figure, [FileName, '.', Extension]);
                 
             else
                 
                 saveas(Figure,...
-                    [TableName, '_', FileName, '.', Extension], Extension);
+                    [FileName, '.', Extension], Extension);
                 
             end
             
